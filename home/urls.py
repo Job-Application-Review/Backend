@@ -32,8 +32,8 @@ urlpatterns = [
     path("current_user/", current_user),
     path("users/", UserList.as_view()),
     path(
-        "all-users",
-        views.allUser,
-        name="allUser",
+        "sendMail",
+        views.sendMail,
+        name="sendMail",
     ),
 ]

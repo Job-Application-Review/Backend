@@ -1,6 +1,12 @@
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
-from django.http import HttpResponseRedirect, JsonResponse
-from django.shortcuts import render
+from django.contrib.sites.shortcuts import get_current_site
+from django.core.mail import EmailMessage
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.shortcuts import redirect, render
+from django.template.loader import render_to_string
+from django.utils.encoding import force_bytes, force_text
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from rest_framework import permissions, status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -114,10 +120,20 @@ def applicationUpdate(request, pk):
     task = Application.objects.get(id=pk)
     serializer = ApplicationSerializer(instance=task, data=request.data)
 
-    print(serializer)
+    mail_subject = "Job Application Mail"
+    to_email = task.email
 
     if serializer.is_valid():
         serializer.save()
+
+        print(serializer.data["status"])
+        if serializer.data["status"] == "A":
+            message = "Your application has been accepted"
+        else:
+            message = "Your application has been rejcted"
+
+        email = EmailMessage(mail_subject, message, to=[to_email])
+        email.send()
 
     return Response(serializer.data)
 
@@ -137,3 +153,12 @@ def allUser(request):
 
     serializer = UserSerializer(user)
     return Response(serializer.data)
+
+
+def sendMail(request):
+    mail_subject = "Activate your blog account."
+    # message = render_to_string("acc_active_email.html")
+    message = "There are some changes made in your application"
+    to_email = "shubhamofficial7413@gmail.com"
+    email = EmailMessage(mail_subject, message, to=[to_email])
+    email.send()
