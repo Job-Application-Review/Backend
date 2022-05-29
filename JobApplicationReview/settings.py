@@ -11,8 +11,9 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 import os
-from pathlib import Path
 from datetime import timedelta
+from pathlib import Path
+import datetime
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -28,7 +29,9 @@ SECRET_KEY = "django-insecure-2&j@uv=a#6^v6308p&3q-4q(aw+w(uhf8^$@t=hzpixuwkf(e2
 DEBUG = True
 
 ALLOWED_HOSTS = []
+
 CORS_ORIGIN_ALLOW_ALL = True
+# CORS_ORIGIN_WHITELIST = ("https://localhost:3000",)
 
 # Application definition
 
@@ -39,17 +42,34 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "home",
+    # "home",
+    "home.apps.HomeConfig",
     "rest_framework",
     "corsheaders",
 ]
 
-# REST_FRAMEWORK = {
-#     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
-#     "DEFAULT_AUTHENTICATION_CLASSES": (
-#         "rest_framework_simplejwt.authentication.JWTAuthentication",
-#     ),  #
-# }
+
+JWT_AUTH = {"JWT_RESPONSE_PAYLOAD_HANDLER": "home.utils.my_jwt_response_handler"}
+
+REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_jwt.authentication.JSONWebTokenAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.BasicAuthentication",
+    ),
+}
+
+JWT_AUTH = {
+    # how long the original token is valid for
+    "JWT_EXPIRATION_DELTA": datetime.timedelta(days=2),
+    # allow refreshing of tokens
+    "JWT_ALLOW_REFRESH": True,
+    # this is the maximum time AFTER the token was issued that
+    # it can be refreshed.  exprired tokens can't be refreshed.
+    "JWT_REFRESH_EXPIRATION_DELTA": datetime.timedelta(days=7),
+}
+
 # SIMPLE_JWT = {
 #     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
 #     "REFRESH_TOKEN_LIFETIME": timedelta(days=14),

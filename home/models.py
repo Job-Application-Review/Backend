@@ -10,7 +10,7 @@ STATUS = (
 
 
 class Application(models.Model):
-
+    username = models.CharField(null=True, blank=True, max_length=100)
     name = models.CharField(null=True, blank=True, max_length=100)
     email = models.EmailField(null=True, blank=True, max_length=254)
     phone = models.BigIntegerField(null=True, blank=True)
